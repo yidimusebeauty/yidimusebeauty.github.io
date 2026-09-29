@@ -60,18 +60,17 @@ input,select{display:block;width:100%;margin-top:4px;padding:12px;border:1px sol
 
   <label>Lieu de l'événement<input id="lieu" autocomplete="street-address"></label>
 
-  <div class="tot">Total : <b id="tt"></b><br>Acompte de 50% à payer pour réserver : <b id="ac" style="color:var(--red)"></b><br><small style="color:var(--mute)">Déplacement (à partir de 5€) : à régler à la fin de la prestation</small></div>
+  <div class="tot">Total : <b id="tt"></b><br><small style="color:var(--mute)">Déplacement (à partir de 5€) : à régler à la fin de la prestation</small></div>
   <button class="go" id="go" disabled>Réserver</button>
 
   <div id="res">
     <b>Dernière étape</b>
-    <p>1. Paie l'acompte de 50% (<span id="ac2"></span>) pour valider ta réservation.</p>
-    <a class="btn" id="pay" target="_blank" rel="noopener" style="display:none">Payer l'acompte</a>
-    <p>2. Envoie ta demande de rendez-vous :</p>
+    <p>Envoie ta demande de rendez-vous :</p>
     <pre id="msg"></pre>
     <a class="btn" id="send" target="_blank" rel="noopener" style="display:none">Envoyer ma demande</a>
     <button class="btn alt" id="cp">Copier le message</button>
     <p class="sub" id="ok"></p>
+    <p>Je te réponds en privé pour confirmer ton rendez-vous.</p>
   </div>
 
   <p style="text-align:center;color:var(--ink);font-weight:700;font-size:26px;margin:28px 0 0">J'ai hâte de vous sublimer ✨</p>
@@ -79,9 +78,8 @@ input,select{display:block;width:100%;margin-top:4px;padding:12px;border:1px sol
 
 <script>
 // ===== À REMPLIR =====
-var WHATSAPP="";  // ton numéro sans + ni espaces, ex: 33612345678
+var WHATSAPP="33769514043";  // ton numéro sans + ni espaces, ex: 33612345678
 var EMAIL="";     // ou ton email (utilisé si pas de WhatsApp)
-var PAYPAL="";    // ton pseudo PayPal.me pour l'acompte, ex: yidimuse
 var BOOKED=[];    // rdv déjà pris, ex: {d:"2026-10-12",s:"09:00"}
 // =====================
 var SERVICES=[
@@ -124,7 +122,7 @@ function refresh(){var bl=blocks();bl.forEach(function(b){
   var e=document.createElement("small");e.textContent="→ "+hh(s+DUR);k.appendChild(e);
   k.onclick=function(){b.pick=s;refresh();upd()};c.appendChild(k)})})}
 function total(){var t=0;[].forEach.call(document.querySelectorAll(".pm"),function(s){t+=SERVICES[+s.value].p});return t}
-function upd(){if(persons())refresh();var t=total();$("tt").textContent=t+"€";$("ac").textContent=(t/2)+"€";
+function upd(){if(persons())refresh();var t=total();$("tt").textContent=t+"€";
  var ok=$("tel").value.trim()&&$("lieu").value.trim();
  [].forEach.call(document.querySelectorAll(".pn,.pnm"),function(x){if(!x.value.trim())ok=false});
  blocks().forEach(function(b){if(b.pick==null||!dv(b))ok=false});
@@ -134,12 +132,11 @@ document.addEventListener("change",function(e){if(e.target.classList.contains("p
 persons();refresh();upd();
 
 $("go").onclick=function(){
- var t=total(),ac=t/2,pn=document.querySelectorAll(".pn"),pnm=document.querySelectorAll(".pnm"),pt=document.querySelectorAll(".pt"),pm=document.querySelectorAll(".pm"),bl=blocks();
+ var t=total(),pn=document.querySelectorAll(".pn"),pnm=document.querySelectorAll(".pnm"),pt=document.querySelectorAll(".pt"),pm=document.querySelectorAll(".pm"),bl=blocks();
  var L=["Bonjour ! Je souhaite réserver :","• Téléphone : "+$("tel").value.trim(),"• Nombre de personnes : "+pm.length];
  for(var i=0;i<pm.length;i++){var s=SERVICES[+pm[i].value];L.push("• Personne "+(i+1)+" : "+pn[i].value.trim()+" "+pnm[i].value.trim().toUpperCase()+" — "+pt[i].value+" — "+s.n+" ("+s.p+"€) — "+new Date(dv(bl[i])+"T12:00:00").toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"})+" de "+hh(bl[i].pick)+" à "+hh(bl[i].pick+DUR))}
- L.push("• Lieu : "+$("lieu").value.trim(),"• Déplacement (à partir de 5€) : à régler à la fin de la prestation","• Total : "+t+"€ — Acompte 50% : "+ac+"€");
- var m=L.join("\n");$("msg").textContent=m;$("ac2").textContent=ac+"€";
- var p=$("pay");if(PAYPAL){p.href="https://paypal.me/"+PAYPAL+"/"+ac+"EUR";p.style.display="block"}
+ L.push("• Lieu : "+$("lieu").value.trim(),"• Déplacement (à partir de 5€) : à régler à la fin de la prestation","• Total : "+t+"€");
+ var m=L.join("\n");$("msg").textContent=m;
  var s=$("send");if(WHATSAPP){s.href="https://wa.me/"+WHATSAPP+"?text="+encodeURIComponent(m);s.style.display="block"}
  else if(EMAIL){s.href="mailto:"+EMAIL+"?subject="+encodeURIComponent("Demande de RDV")+"&body="+encodeURIComponent(m);s.style.display="block"}
  $("res").style.display="block";$("res").scrollIntoView({behavior:"smooth"});$("ok").textContent="";
