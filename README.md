@@ -1,1 +1,1 @@
-# yidimusebeauty.com
+# yidimusebeauty.github.io
